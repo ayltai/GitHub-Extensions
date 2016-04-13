@@ -53,6 +53,7 @@ Approvers.prototype.getTimestamp = function(i) {
 
 var uniqueId = 1;
 var scriptId = 'github-extensions-';
+var emojiId  = scriptId + 'emoji-plusone';
 var pageUrl  = $(location).attr('href');
 
 // Pull request
@@ -62,6 +63,8 @@ if (pageUrl.indexOf('/pull/') > -1) {
   if (approvers.size() > 0) {
     showApproversSidebar(approvers);
   }
+  
+  $('.js-toolbar.toolbar-commenting').prepend(createReactionButtons());
 }
 
 function showApproversSidebar(approvers) {
@@ -79,6 +82,12 @@ function createAvatarImgTags(approvers) {
   }
   
   return approverIcons;
+}
+
+function createReactionButtons() {
+  // TODO: Add more emojis
+  $('#' + emojiId).remove();
+  return '<button id="' + emojiId + '" type="button" class="toolbar-item js-toolbar-item tooltipped-n" aria-label="+1" tabIndex="-1" data-suffix=":+1:"><img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle" /></button>';
 }
 
 // Pull request listing
