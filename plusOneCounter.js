@@ -51,7 +51,8 @@ Approvers.prototype.getTimestamp = function(i) {
   return this.timestamps[i];
 };
 
-var scriptId = 'github-extensions';
+var uniqueId = 1;
+var scriptId = 'github-extensions-';
 var pageUrl  = $(location).attr('href');
 
 // Pull request
@@ -64,8 +65,8 @@ if (pageUrl.indexOf('/pull/') > -1) {
 }
 
 function showApproversSidebar(approvers) {
-  $('#' + scriptId).remove();
-  $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><button class="discussion-sidebar-heading discussion-sidebar-toggle" disabled="disabled">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</button></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
+  $('#' + scriptId + uniqueId).remove();
+  $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + (uniqueId++) + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><h3 class="discussion-sidebar-heading">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
 }
 
 function createAvatarImgTags(approvers) {
@@ -112,8 +113,8 @@ $('.js-issue-row').each(function() {
       
       linkTitle += (approvers.size() == 1 ? ' has' : ' have') + ' approved this pull request';
       
-      $('#' + scriptId).remove();
-      commentsContainer.prepend('<div id="' + scriptId + '">' + approverIcons + '<a href="' + issueUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
+      $('#' + scriptId + uniqueId).remove();
+      commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + issueUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
       messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
     }
   });
