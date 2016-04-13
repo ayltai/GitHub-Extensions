@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "GitHub Extensions",
   "description": "A bunch of little enhancements for GitHub web",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Alan Tai",
   "icons": {
     "128": "github-128.png"
@@ -21,10 +21,5 @@
     "scripts": ["background.js"],
     "persistent": false
   },
-  "offline_enabled": false,
-  "applications": {
-    "gecko": {
-      "id": "ayltai-github-extensions@github.com"
-    }
-  }
+  "offline_enabled": false
 }
