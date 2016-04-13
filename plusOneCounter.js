@@ -18,7 +18,8 @@ $('.js-issue-row').each(function() {
         if (messageText == '+1'
         || messageText == 'lg2m'
         || commentRow.find('img[title=":+1:"]').length == 1
-        || commentRow.find('img[title=":thumbsup:"]').length == 1) {
+        || commentRow.find('img[title=":thumbsup:"]').length == 1
+        || commentRow.find('g-emoji[alias="+1"]').length == 1) {
           usernames.push(username);
           thumbsUpCount++;
         }
