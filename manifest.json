@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "GitHub Extensions",
+  "description": "A bunch of little enhancements for GitHub web",
+  "version": "0.1.0",
+  "author": "Alan Tai",
+  "icons": {
+    "128": "github-128.png"
+  },
+  "permissions": [
+    "https://github.com/*",
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "offline_enabled": false
+}
