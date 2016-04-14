@@ -9,6 +9,7 @@
 
 ##Download
 Chrome extension: https://chrome.google.com/webstore/detail/github-extensions/kcpjgnnjanhjemebnjlecldedhfnggah
+
 Firefox add-on: https://addons.mozilla.org/en-US/firefox/addon/github-extensions/
 
 ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot1.png "") ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot3.png "") ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot2.png "")
