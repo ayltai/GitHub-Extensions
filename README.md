@@ -8,4 +8,7 @@
 * **Plus-One Emoji** - Shows a plus-one emoji icon for commenting plus-one only message
 * Well, more to come...
 
-![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot1.png "") ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot2.png "")
+##Download
+Chrome extension: https://chrome.google.com/webstore/detail/github-extensions/kcpjgnnjanhjemebnjlecldedhfnggah
+
+![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot1.png "") ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot3.png "") ![](https://github.com/ayltai/GitHub-Extensions/blob/master/screenshot2.png "")
