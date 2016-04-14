@@ -51,6 +51,57 @@ Approvers.prototype.getTimestamp = function(i) {
   return this.timestamps[i];
 };
 
+function showApproversSidebar(approvers) {
+  $('#' + scriptId + uniqueId).remove();
+  $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + (uniqueId++) + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><h3 class="discussion-sidebar-heading">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
+}
+
+function createAvatarImgTags(approvers) {
+  var approverIcons = '';
+  
+  for (i = 0; i < approvers.size(); i++) {
+    approverIcons += '<a href="https://github.com/' + approvers.getUsername(i) + '" title="' + approvers.getUsername(i) + ' has approved this pull request ' + approvers.getTimestamp(i) + '">';
+    approverIcons += '<img class="avatar" width="20" height="20" alt="' + approvers.getUsername(i) + '" src="' + approvers.getAvatarUrl(i).substring(0, approvers.getAvatarUrl(i).length - 2) + '40" />';
+    approverIcons += '</a>&nbsp;';
+  }
+  
+  return approverIcons;
+}
+
+function createReactionButtons() {
+  // TODO: Add more emojis
+  $('#' + emojiId).remove();
+  return '<button id="' + emojiId + '" type="button" class="toolbar-item js-toolbar-item tooltipped-n" aria-label="+1" tabIndex="-1" data-suffix=":+1:"><img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle" /></button>';
+}
+
+function createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage) {
+  var button = $('#' + mergeId + prId);
+  button.parent().remove();
+  
+  sibling.after('<div class="table-list-cell" style="width: 60px;"><button id="' + mergeId + prId + '" class="btn btn-sm btn-primary js-merge-branch-action" type="button" style="vertical-align: middle;">Merge</button></div>');
+  button = $('#' + mergeId + prId);
+  
+  button.click(function() {
+    $(this).prop('disabled', true);
+    
+    $.post('https://github.com' + prUrl + '/merge', {
+      utf8: formUtf8,
+      authenticity_token: authToken,
+      head_sha: headSha,
+      commit_title: formCommitTitle,
+      commit_message: formCommitMessage
+    }, function(data, status, xhr) {
+      if (status === 'success') {
+        button.parent().remove();
+        sibling.after('<div class="table-list-cell" style="width: 60px;"><div class="state state-merged">Merged</div></div>');
+      } else {
+        button.removeClass('btn-primary');
+        button.text('Failed');
+      }
+    });
+  });
+}
+
 var uniqueId = 1;
 var scriptId = 'github-extensions-';
 var emojiId  = scriptId + 'emoji-plusone';
@@ -133,57 +184,6 @@ if (pageUrl.indexOf('/pulls') > -1) {
         
         commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + prUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
         messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
-      }
-    });
-  });
-}
-
-function showApproversSidebar(approvers) {
-  $('#' + scriptId + uniqueId).remove();
-  $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + (uniqueId++) + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><h3 class="discussion-sidebar-heading">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
-}
-
-function createAvatarImgTags(approvers) {
-  var approverIcons = '';
-  
-  for (i = 0; i < approvers.size(); i++) {
-    approverIcons += '<a href="https://github.com/' + approvers.getUsername(i) + '" title="' + approvers.getUsername(i) + ' has approved this pull request ' + approvers.getTimestamp(i) + '">';
-    approverIcons += '<img class="avatar" width="20" height="20" alt="' + approvers.getUsername(i) + '" src="' + approvers.getAvatarUrl(i).substring(0, approvers.getAvatarUrl(i).length - 2) + '40" />';
-    approverIcons += '</a>&nbsp;';
-  }
-  
-  return approverIcons;
-}
-
-function createReactionButtons() {
-  // TODO: Add more emojis
-  $('#' + emojiId).remove();
-  return '<button id="' + emojiId + '" type="button" class="toolbar-item js-toolbar-item tooltipped-n" aria-label="+1" tabIndex="-1" data-suffix=":+1:"><img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle" /></button>';
-}
-
-function createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage) {
-  var button = $('#' + mergeId + prId);
-  button.parent().remove();
-  
-  sibling.after('<div class="table-list-cell" style="width: 60px;"><button id="' + mergeId + prId + '" class="btn btn-sm btn-primary js-merge-branch-action" type="button" style="vertical-align: middle;">Merge</button></div>');
-  button = $('#' + mergeId + prId);
-  
-  button.click(function() {
-    $(this).prop('disabled', true);
-    
-    $.post('https://github.com' + prUrl + '/merge', {
-      utf8: formUtf8,
-      authenticity_token: authToken,
-      head_sha: headSha,
-      commit_title: formCommitTitle,
-      commit_message: formCommitMessage
-    }, function(data, status, xhr) {
-      if (status === 'success') {
-        button.parent().remove();
-        sibling.after('<div class="table-list-cell" style="width: 60px;"><div class="state state-merged">Merged</div></div>');
-      } else {
-        button.removeClass('btn-primary');
-        button.text('Failed');
       }
     });
   });
