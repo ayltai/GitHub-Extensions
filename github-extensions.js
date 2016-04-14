@@ -67,6 +67,59 @@ if (pageUrl.indexOf('/pull/') > -1) {
   $('.js-toolbar.toolbar-commenting').prepend(createReactionButtons());
 }
 
+// Pull request listing
+if (pageUrl.indexOf('/pulls') > -1) {
+  $('.js-issue-row').each(function() {
+    var issueRow            = $(this);
+    var issueUrl            = issueRow.find('a.issue-title-link').attr('href');
+    var issueTitleContainer = issueRow.find('.table-list-cell.issue-title');
+    var commentsContainer   = issueRow.find('.issue-comments');
+    
+    issueTitleContainer.width('650px');
+    commentsContainer.width('170px');
+    
+    $.get('https://github.com' + issueUrl, function(data) {
+      var html           = $.parseHTML(data);
+      var approvers      = new Approvers($(html));
+      var buildStatuses  = $(html).find('a.build-status-details');
+      
+      // Links commit build status to CI build details page
+      if (buildStatuses.length > 0) {
+        var buildStatusUrl = buildStatuses.first().attr('href');
+        
+        if (buildStatusUrl) {
+          var commitBuildStatuses = issueRow.find('.commit-build-statuses');
+          
+          if (commitBuildStatuses.length > 0) {
+            commitBuildStatuses.first().find('a.tooltipped.tooltipped-e').attr('href', buildStatusUrl);
+          }
+        }
+      }
+      
+      if (approvers.size() > 0) {
+        var approverIcons    = createAvatarImgTags(approvers);
+        var thumbsUpIcon     = '<img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle">';
+        var linkTitle        = '';
+        var messageContainer = commentsContainer.find('.muted-link');
+        var messageCount     = messageContainer.text();
+        
+        for (i = 0; i < approvers.size(); i++) {
+          if (i === 0) {
+            linkTitle = approvers.getUsername(0);
+          } else {
+            linkTitle += ', ' + approvers.getUsername(i);
+          }
+        }
+        
+        linkTitle += (approvers.size() == 1 ? ' has' : ' have') + ' approved this pull request';
+        
+        commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + issueUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
+        messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
+      }
+    });
+  });
+}
+
 function showApproversSidebar(approvers) {
   $('#' + scriptId + uniqueId).remove();
   $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + (uniqueId++) + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><h3 class="discussion-sidebar-heading">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
@@ -89,42 +142,3 @@ function createReactionButtons() {
   $('#' + emojiId).remove();
   return '<button id="' + emojiId + '" type="button" class="toolbar-item js-toolbar-item tooltipped-n" aria-label="+1" tabIndex="-1" data-suffix=":+1:"><img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle" /></button>';
 }
-
-// Pull request listing
-$('.js-issue-row').each(function() {
-  var issueRow = $(this);
-  var issueUrl = issueRow.find('a.issue-title-link').attr('href');
-  
-  $.get('https://github.com' + issueUrl, function(data) {
-    var html      = $.parseHTML(data);
-    var approvers = new Approvers($(html));
-    
-    var issueTitleContainer = issueRow.find('.table-list-cell.issue-title');
-    var commentsContainer   = issueRow.find('.issue-comments');
-    
-    issueTitleContainer.width('650px');
-    commentsContainer.width('170px');
-    
-    if (approvers.size() > 0) {
-      var approverIcons    = createAvatarImgTags(approvers);
-      var thumbsUpIcon     = '<img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle">';
-      var linkTitle        = '';
-      var messageContainer = commentsContainer.find('.muted-link');
-      var messageCount     = messageContainer.text();
-      
-      for (i = 0; i < approvers.size(); i++) {
-        if (i === 0) {
-          linkTitle = approvers.getUsername(0);
-        } else {
-          linkTitle += ', ' + approvers.getUsername(i);
-        }
-      }
-      
-      linkTitle += (approvers.size() == 1 ? ' has' : ' have') + ' approved this pull request';
-      
-      $('#' + scriptId + uniqueId).remove();
-      commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + issueUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
-      messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
-    }
-  });
-});

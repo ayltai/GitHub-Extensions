@@ -12,7 +12,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         runAt: 'document_end'
       }, function() {
         chrome.tabs.executeScript(tabId, {
-          file: 'plusOneCounter.js',
+          file: 'github-extensions.js',
           runAt: 'document_end'
         });
       });
