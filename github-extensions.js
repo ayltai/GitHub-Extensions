@@ -55,6 +55,31 @@ var emojiId  = scriptId + 'emoji-plusone';
 var mergeId  = scriptId + 'merge-';
 var pageUrl  = $(location).attr('href');
 
+// All pages
+replaceUsernameWithDisplayName($('button.with-gravatar').find('span'));
+
+$('div.news.column').find('div.alert').each(function() {
+  replaceUsernameWithDisplayName($(this).find('div.title').find('a').first());
+});
+
+$('a.user-mention').each(function() {
+  replaceUsernameWithDisplayName($(this));
+});
+
+// Issue listing or pull request listing page
+if (pageUrl.indexOf('/issues') > -1
+|| pageUrl.indexOf('/pulls') > -1) {
+  $('.js-issue-row').each(function() {
+    var prRow              = $(this);
+    var prCreatorContainer = prRow.find('.issue-meta-section.opened-by').find('a');
+    var prCreator          = prCreatorContainer.text().trim();
+    
+    replaceUsernameWithDisplayName(prCreatorContainer, function(profile) {
+      prCreatorContainer.after('&nbsp;<a href="https://github.com/' + profile.getUsername() + '" title="' + profile.getUsername() + '"><img class="avatar" width="20" height="20" alt="' + prCreator + '" src="' + profile.getAvatarUrl(20) + '" /></a>');
+    });
+  });
+}
+
 // Pull request
 if (pageUrl.indexOf('/pull/') > -1) {
   var approvers = new Approvers($('.js-discussion'));
@@ -66,24 +91,8 @@ if (pageUrl.indexOf('/pull/') > -1) {
   $('.js-toolbar.toolbar-commenting').prepend(createReactionButtons());
   
   // Replaces usernames with full names
-  var profiles = {};
-  
   $('a.author').each(function() {
-    var prCreatorContainer = $(this);
-    var prCreator          = prCreatorContainer.text().trim();
-    
-    if (profiles[prCreator]) {
-      prCreatorContainer.text(profiles[prCreator].getDisplayName());
-    } else {
-      $.get('https://github.com/' + prCreator, function(data) {
-        var html    = $.parseHTML(data);
-        var profile = new Profile($(html));
-        
-        prCreatorContainer.text(profile.getDisplayName());
-        
-        profiles[prCreator] = profile;
-      });
-    }
+    replaceUsernameWithDisplayName($(this));
   });
 }
 
@@ -153,18 +162,6 @@ if (pageUrl.indexOf('/pulls') > -1) {
         commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + prUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
         messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
       }
-    });
-    
-    // Replaces usernames with full names
-    var prCreatorContainer = prRow.find('.issue-meta-section.opened-by').find('a');
-    var prCreator          = prCreatorContainer.text().trim();
-    
-    $.get('https://github.com/' + prCreator, function(data) {
-      var html    = $.parseHTML(data);
-      var profile = new Profile($(html));
-      
-      prCreatorContainer.text(profile.getDisplayName());
-      prCreatorContainer.after('&nbsp;<a href="https://github.com/' + profile.getUsername() + '" title="' + profile.getUsername() + '"><img class="avatar" width="20" height="20" alt="' + prCreator + '" src="' + profile.getAvatarUrl(20) + '" /></a>');
     });
   });
 }

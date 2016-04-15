@@ -1,3 +1,6 @@
+// Username-Profile mapping
+var profiles = {};
+
 // Parser for user profile
 var Profile = function(element) {
   this.element = element;
@@ -16,7 +19,7 @@ var Profile = function(element) {
   this.avatarUrl   = avatarUrl;
   this.userId      = userId;
   this.username    = username;
-  this.displayName = displayName;
+  this.displayName = displayName.length === 0 ? username : displayName;
 };
 
 Profile.prototype.getAvatarUrl = function(size) {
@@ -34,3 +37,26 @@ Profile.prototype.getUsername = function() {
 Profile.prototype.getDisplayName = function() {
   return this.displayName;
 };
+
+function replaceUsernameWithDisplayName(container, callback) {
+  if (container) {
+    var username = container.text().trim();
+    
+    if (profiles[username]) {
+      container.text(profiles[username].getDisplayName());
+    } else {
+      $.get('https://github.com/' + username, function(data) {
+        var html    = $.parseHTML(data);
+        var profile = new Profile($(html));
+        
+        container.text(profile.getDisplayName());
+        
+        profiles[username] = profile;
+        
+        if (callback) {
+          callback(profile);
+        }
+      });
+    }
+  }
+}
