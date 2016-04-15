@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "GitHub Extensions",
   "description": "A bunch of little enhancements for GitHub web",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "Alan Tai",
   "icons": {
     "128": "github-128.png"

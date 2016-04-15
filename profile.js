@@ -48,7 +48,7 @@ function replaceUsernameWithDisplayName(container, callback) {
     if (profiles[username]) {
       container.text(profiles[username].getDisplayName());
     } else {
-      requests.push($.get('https://github.com/' + username, function(data) {
+      requests.push($.get(baseUrl + '/' + username, function(data) {
         var html    = $.parseHTML(data);
         var profile = new Profile($(html));
         

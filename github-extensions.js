@@ -7,32 +7,86 @@ var baseUrl  = window.location.protocol + '//' + window.location.host;
 
 function showApproversSidebar(approvers) {
   $('#' + scriptId + uniqueId).remove();
-  $('#partial-discussion-sidebar').prepend('<div id="' + scriptId + (uniqueId++) + '" class="discussion-sidebar-item sidebar-labels js-discussion-sidebar-item"><div class="select-menu js-menu-container js-select-menu label-select-menu"><h3 class="discussion-sidebar-heading">' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
+  
+  $(document.createElement('div'))
+    .attr('id', scriptId + (uniqueId++))
+    .addClass('discussion-sidebar-item sidebar-labels js-discussion-sidebar-item')
+    .append($(document.createElement('div'))
+      .addClass('select-menu js-menu-container js-select-menu label-select-menu')
+      .append($(document.createElement('h3'))
+        .addClass('discussion-sidebar-heading')
+        .text(approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers'))
+      )
+    )
+    .append($(document.createElement('div'))
+      .addClass('css-truncate')
+      .append(createAvatarImgTags(approvers))
+    );
+    
+  $('#partial-discussion-sidebar').prepend(approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
 }
 
 function createAvatarImgTags(approvers) {
-  var approverIcons = '';
+  var approverIcons = createAvatarImgTag(approvers[0]);
   
-  for (i = 0; i < approvers.size(); i++) {
-    approverIcons += '<a href="https://github.com/' + approvers.getUsername(i) + '" title="' + approvers.getUsername(i) + ' has approved this pull request ' + approvers.getTimestamp(i) + '">';
-    approverIcons += '<img class="avatar" width="20" height="20" alt="' + approvers.getUsername(i) + '" src="' + approvers.getAvatarUrl(i).substring(0, approvers.getAvatarUrl(i).length - 2) + '40" />';
-    approverIcons += '</a>&nbsp;';
+  for (i = 1; i < approvers.size(); i++) {
+    approverIcons.after(createAvatarImgTag(approvers[i]));
   }
   
   return approverIcons;
 }
 
+function createAvatarImgTag(approver) {
+  return $(document.createElement('a'))
+    .attr('href', baseUrl + approver.getUsername())
+    .attr('title', approver.getUsername() + ' has approved this pull request ' + approver.getTimestamp())
+    .append($(document.createElement('img'))
+      .attr('width', '20')
+      .attr('height', '20')
+      .attr('alt', approver.getUsername())
+      .attr('src', approver.getAvatarUrl().substring(0, approver.getAvatarUrl().length - 2) + '40')
+      .addClass('avatar')
+    );
+}
+
 function createReactionButtons() {
   // TODO: Add more emojis
   $('#' + emojiId).remove();
-  return '<button id="' + emojiId + '" type="button" class="toolbar-item js-toolbar-item tooltipped-n" aria-label="+1" tabIndex="-1" data-suffix=":+1:"><img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle" /></button>';
+  
+  return $(document.createElement('button'))
+    .attr('id', emojiId)
+    .attr('type', 'button')
+    .attr('aria-label', '+1')
+    .attr('tabIndex', '-1')
+    .attr('data-suffix', ':+1:')
+    .addClass('toolbar-item js-toolbar-item tooltipped-n')
+    .append($(document.createElement('img'))
+      .attr('title', ':+1:')
+      .attr('alt', ':+1:')
+      .attr('src', 'https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png')
+      .attr('width', '20')
+      .attr('height', '20')
+      .attr('align', 'absmiddle')
+      .addClass('emoji')
+    );
 }
 
 function createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage) {
   var button = $('#' + mergeId + prId);
   button.parent().remove();
   
-  sibling.after('<div class="table-list-cell" style="width: 60px;"><button id="' + mergeId + prId + '" class="btn btn-sm btn-primary js-merge-branch-action" type="button" style="vertical-align: middle;">Merge</button></div>');
+  sibling.after($(document.createElement('div'))
+    .addClass('table-list-cell')
+    .css('width', '60px')
+    .append($(document.createElement('button'))
+      .attr('id', mergeId + prId)
+      .attr('type', 'button')
+      .addClass('btn btn-sm btn-primary js-merge-branch-action')
+      .css('vertical-align', 'middle')
+      .text('Merge')
+    )
+  );
+  
   button = $('#' + mergeId + prId);
   
   button.click(function() {
@@ -47,7 +101,15 @@ function createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, f
     }, function(data, status, xhr) {
       if (status === 'success') {
         button.parent().remove();
-        sibling.after('<div class="table-list-cell" style="width: 60px;"><div class="state state-merged">Merged</div></div>');
+        
+        sibling.after($(document.createElement('div'))
+          .addClass('table-list-cell')
+          .css('width', '60px')
+          .append($(document.createElement('div'))
+            .addClass('state state-merged')
+            .text('Merged')
+          )
+        );
       } else {
         button.removeClass('btn-primary');
         button.text('Failed');
@@ -82,7 +144,18 @@ function applyHacks() {
       var prCreator          = prCreatorContainer.text().trim();
       
       replaceUsernameWithDisplayName(prCreatorContainer, function(profile) {
-        prCreatorContainer.after('&nbsp;<a href="' + baseUrl + '/' + profile.getUsername() + '" title="' + profile.getUsername() + '"><img class="avatar" width="20" height="20" alt="' + prCreator + '" src="' + profile.getAvatarUrl(20) + '" /></a>');
+        prCreatorContainer.after('&nbsp;').after($(document.createElement('a'))
+          .attr('href', baseUrl + '/' + profile.getUsername())
+          .attr('title', profile.getUsername())
+          .append('&nbsp;')
+          .append($(document.createElement('img'))
+            .attr('width', '20')
+            .attr('height', '20')
+            .attr('alt', prCreator)
+            .attr('src', profile.getAvatarUrl(20))
+            .addClass('avatar')
+          )
+        );
       });
     });
   }
@@ -144,14 +217,18 @@ function applyHacks() {
         && $(html).find('button.js-merge-branch-action').length > 0) {
           createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage);
         } else {
-          sibling.after('<div class="table-list-cell" style="width: 60px;">&nbsp;</div>');
+          sibling.after($(document.createElement('div'))
+            .css('width', '60px')
+            .addClass('table-list-cell')
+            .append('&nbsp;')
+          );
         }
         
         var approvers = new Approvers($(html));
         
         if (approvers.size() > 0) {
           var approverIcons    = createAvatarImgTags(approvers);
-          var thumbsUpIcon     = '<img class="emoji" title=":+1:" alt=":+1:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20" align="absmiddle">';
+          var thumbsUpIcon     = $(document.createElement('img')).attr('title', ':+1:').attr('alt', ':+1:').attr('src', 'https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png').attr('width', '20').attr('height', '20').attr('align', 'absmiddle').addClass('emoji');
           var linkTitle        = '';
           var messageContainer = commentsContainer.find('.muted-link');
           var messageCount     = messageContainer.text();
@@ -166,7 +243,20 @@ function applyHacks() {
           
           linkTitle += (approvers.size() == 1 ? ' has' : ' have') + ' approved this pull request';
           
-          commentsContainer.prepend('<div id="' + scriptId + (uniqueId++) + '" style="display: inline-block;">' + approverIcons + '<a href="' + prUrl + '" class="muted-link" title="' + linkTitle + '">' + thumbsUpIcon + '&nbsp;' + approvers.size() + '</a></div>&nbsp;&nbsp;');
+          commentsContainer.prepend($(document.createElement('div'))
+            .attr('id', scriptId + (uniqueId++))
+            .css('display', 'inline-block')
+            .text(approverIcons)
+            .append($(document.createElement('a'))
+              .attr('href', prUrl)
+              .attr('title', linkTitle)
+              .addClass('muted-link')
+              .append(thumbsUpIcon)
+              .append('&nbsp;' + approvers.size())
+            )
+          )
+          .append('&nbsp;&nbsp;');
+          
           messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
         }
       }));
