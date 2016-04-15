@@ -24,6 +24,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         runAt: 'document_end'
       },
       {
+        file: 'helper.js',
+        runAt: 'document_end'
+      },
+      {
         file: 'approvers.js',
         runAt: 'document_end'
       },

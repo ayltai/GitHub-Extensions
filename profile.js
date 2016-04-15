@@ -10,16 +10,19 @@ var Profile = function(element) {
   var username    = '';
   var displayName = '';
   
-  avatarUrl   = this.element.find('a.vcard-avatar').find('img.avatar').attr('src');
-  avatarUrl   = avatarUrl.substring(0, avatarUrl.length - 3);
-  userId      = avatarUrl.substring(avatarUrl.indexOf('/u/') + 3, avatarUrl.indexOf('?v='));
-  username    = this.element.find('div.vcard-username').text();
-  displayName = this.element.find('div.vcard-fullname').text();
+  avatarUrl = this.element.find('a.vcard-avatar').find('img.avatar').attr('src');
   
-  this.avatarUrl   = avatarUrl;
-  this.userId      = userId;
-  this.username    = username;
-  this.displayName = displayName.length === 0 ? username : displayName;
+  if (avatarUrl) {
+    avatarUrl   = avatarUrl.substring(0, avatarUrl.length - 3);
+    userId      = avatarUrl.substring(avatarUrl.indexOf('/u/') + 3, avatarUrl.indexOf('?v='));
+    username    = this.element.find('div.vcard-username').text();
+    displayName = this.element.find('div.vcard-fullname').text();
+    
+    this.avatarUrl   = avatarUrl;
+    this.userId      = userId;
+    this.username    = username;
+    this.displayName = displayName.length === 0 ? username : displayName;
+  }
 };
 
 Profile.prototype.getAvatarUrl = function(size) {
@@ -45,7 +48,7 @@ function replaceUsernameWithDisplayName(container, callback) {
     if (profiles[username]) {
       container.text(profiles[username].getDisplayName());
     } else {
-      $.get('https://github.com/' + username, function(data) {
+      requests.push($.get('https://github.com/' + username, function(data) {
         var html    = $.parseHTML(data);
         var profile = new Profile($(html));
         
@@ -56,7 +59,7 @@ function replaceUsernameWithDisplayName(container, callback) {
         if (callback) {
           callback(profile);
         }
-      });
+      }));
     }
   }
 }
