@@ -20,7 +20,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo && changeInfo.status == 'loading') {
     executeScripts(tabId, [
       {
-        file: 'jquery-2.2.2.min.js',
+        file: 'jquery-2.2.3.min.js',
         runAt: 'document_end'
       },
       {
