@@ -12,16 +12,16 @@ var Approvers = function(element) {
     var avatarUrl        = commentWrapper.find('img.timeline-comment-avatar').attr('src');
     var commentContainer = commentWrapper.find('.comment.js-comment');
     var username         = commentContainer.find('a.author').text();
-    var timestamp        = commentContainer.find('time').text();
+    var timestamp        = commentContainer.find('time').length > 0 ? commentContainer.find('time').text() : commentContainer.find('relative-time').text();
     var commentRow       = commentContainer.find('.comment-body.js-comment-body');
     var messageText      = commentRow.text().trim();
     
-    if (messageText == '+1'
-    || messageText.toLowerCase() == 'lg2m'
-    || messageText.toLowerCase() == 'lgtm'
-    || commentRow.find('img[title=":+1:"]').length == 1
-    || commentRow.find('img[title=":thumbsup:"]').length == 1
-    || commentRow.find('g-emoji[alias="+1"]').length == 1) {
+    if (messageText === '+1'
+    || messageText.toLowerCase() === 'lg2m'
+    || messageText.toLowerCase() === 'lgtm'
+    || commentRow.find('img[title=":+1:"]').length === 1
+    || commentRow.find('img[title=":thumbsup:"]').length === 1
+    || commentRow.find('g-emoji[alias="+1"]').length === 1) {
       usernames.push(username);
       avatarUrls.push(avatarUrl);
       timestamps.push(timestamp);

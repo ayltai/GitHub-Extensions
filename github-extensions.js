@@ -8,43 +8,38 @@ var baseUrl  = window.location.protocol + '//' + window.location.host;
 function showApproversSidebar(approvers) {
   $('#' + scriptId + uniqueId).remove();
   
-  $(document.createElement('div'))
+  var avatarsContainer = $(document.createElement('div')).addClass('css-truncate');
+  createAvatarImgTags(avatarsContainer, approvers);
+  
+  $('#partial-discussion-sidebar').prepend($(document.createElement('div'))
     .attr('id', scriptId + (uniqueId++))
     .addClass('discussion-sidebar-item sidebar-labels js-discussion-sidebar-item')
     .append($(document.createElement('div'))
       .addClass('select-menu js-menu-container js-select-menu label-select-menu')
       .append($(document.createElement('h3'))
         .addClass('discussion-sidebar-heading')
-        .text(approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers'))
+        .text('' + approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers'))
       )
     )
-    .append($(document.createElement('div'))
-      .addClass('css-truncate')
-      .append(createAvatarImgTags(approvers))
-    );
-    
-  $('#partial-discussion-sidebar').prepend(approvers.size() + (approvers.size() == 1 ? ' approver' : ' approvers') + '</h3></div><div class="css-truncate">' + createAvatarImgTags(approvers) + '</div></div>');
+    .append(avatarsContainer)
+  );
 }
 
-function createAvatarImgTags(approvers) {
-  var approverIcons = createAvatarImgTag(approvers[0]);
-  
-  for (i = 1; i < approvers.size(); i++) {
-    approverIcons.after(createAvatarImgTag(approvers[i]));
+function createAvatarImgTags(container, approvers) {
+  for (i = 0; i < approvers.size(); i++) {
+    container.append(createAvatarImgTag(approvers, i)).append(' ');
   }
-  
-  return approverIcons;
 }
 
-function createAvatarImgTag(approver) {
+function createAvatarImgTag(approvers, index) {
   return $(document.createElement('a'))
-    .attr('href', baseUrl + approver.getUsername())
-    .attr('title', approver.getUsername() + ' has approved this pull request ' + approver.getTimestamp())
+    .attr('href', baseUrl + '/' + approvers.getUsername(index))
+    .attr('title', approvers.getUsername(index) + ' has approved this pull request ' + approvers.getTimestamp(index))
     .append($(document.createElement('img'))
       .attr('width', '20')
       .attr('height', '20')
-      .attr('alt', approver.getUsername())
-      .attr('src', approver.getAvatarUrl().substring(0, approver.getAvatarUrl().length - 2) + '40')
+      .attr('alt', approvers.getUsername(index))
+      .attr('src', approvers.getAvatarUrl(index).substring(0, approvers.getAvatarUrl(index).length - 2) + '40')
       .addClass('avatar')
     );
 }
@@ -130,11 +125,6 @@ function applyHacks() {
     replaceUsernameWithDisplayName($(this));
   });
   
-  $('td.commit-author').each(function() {
-    replaceUsernameWithDisplayName($(this).find('span.author'));
-    replaceUsernameWithDisplayName($(this).find('a.author'));
-  });
-  
   // Issue listing or pull request listing page
   if (pageUrl.indexOf('/issues') > -1
   || pageUrl.indexOf('/pulls') > -1) {
@@ -162,17 +152,22 @@ function applyHacks() {
   
   // Pull request
   if (pageUrl.indexOf('/pull/') > -1) {
-    var approvers = new Approvers($('.js-discussion'));
-    
-    if (approvers.size() > 0) {
-      showApproversSidebar(approvers);
-    }
-    
     $('.js-toolbar.toolbar-commenting').prepend(createReactionButtons());
     
     // Replaces usernames with full names
     $('a.author').each(function() {
       replaceUsernameWithDisplayName($(this));
+    });
+    
+    var approvers = new Approvers($('.js-discussion'));
+    
+    if (approvers.size() > 0) {
+      showApproversSidebar(approvers);
+    }
+  } else {
+    $('td.commit-author').each(function() {
+      replaceUsernameWithDisplayName($(this).find('span.author'));
+      replaceUsernameWithDisplayName($(this).find('a.author'));
     });
   }
   
@@ -227,7 +222,9 @@ function applyHacks() {
         var approvers = new Approvers($(html));
         
         if (approvers.size() > 0) {
-          var approverIcons    = createAvatarImgTags(approvers);
+          var avatarsContainer = $(document.createElement('div')).attr('id', scriptId + (uniqueId++)).css('display', 'inline-block');
+          createAvatarImgTags(avatarsContainer, approvers);
+          
           var thumbsUpIcon     = $(document.createElement('img')).attr('title', ':+1:').attr('alt', ':+1:').attr('src', 'https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png').attr('width', '20').attr('height', '20').attr('align', 'absmiddle').addClass('emoji');
           var linkTitle        = '';
           var messageContainer = commentsContainer.find('.muted-link');
@@ -243,10 +240,7 @@ function applyHacks() {
           
           linkTitle += (approvers.size() == 1 ? ' has' : ' have') + ' approved this pull request';
           
-          commentsContainer.prepend($(document.createElement('div'))
-            .attr('id', scriptId + (uniqueId++))
-            .css('display', 'inline-block')
-            .text(approverIcons)
+          commentsContainer.prepend(avatarsContainer
             .append($(document.createElement('a'))
               .attr('href', prUrl)
               .attr('title', linkTitle)
@@ -254,8 +248,7 @@ function applyHacks() {
               .append(thumbsUpIcon)
               .append('&nbsp;' + approvers.size())
             )
-          )
-          .append('&nbsp;&nbsp;');
+          );
           
           messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
         }

@@ -8,14 +8,22 @@ function abortRequests() {
   requests = [];
 }
 
+function convertAjaxToPageLoad(element) {
+  element.click(function() {
+    window.location.href = baseUrl + '/' + element.attr('href');
+  });
+}
+
 $(window).on('beforeunload', function() {
   abortRequests();
 });
 
 $('nav.reponav').find('a.reponav-item').each(function() {
   var navItem = $(this);
-  
-  navItem.click(function() {
-    window.location.href = baseUrl + '/' + navItem.attr('href');
-  });
+  convertAjaxToPageLoad(navItem);
+});
+
+$('a.btn-link').each(function() {
+  var button = $(this);
+  convertAjaxToPageLoad(button);
 });
