@@ -180,8 +180,8 @@ function applyHacks() {
       var prTitleContainer  = prRow.find('.table-list-cell.issue-title');
       var commentsContainer = prRow.find('.issue-comments');
       
-      prTitleContainer.width('580px');
-      commentsContainer.width('180px');
+      prTitleContainer.width('540px');
+      commentsContainer.width('200px');
       
       requests.push($.get(baseUrl + '/' + prUrl, function(data) {
         var html          = $.parseHTML(data);
