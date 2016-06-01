@@ -205,7 +205,7 @@ function applyHacks() {
         var formUtf8          = $(html).find('input[name="utf8"]').val();
         var formCommitTitle   = $(html).find('input[name="commit_title"]').val();
         var formCommitMessage = $(html).find('textarea[name="commit_message"]').val();
-        var sibling           = prRow.find('div.table-list-cell.table-list-cell-avatar');
+        var sibling           = prRow.find('div.table-list-cell.table-list-cell-avatar-stack');
         
         // Shows merge button
         if ($(html).find('div.state.state-open').length > 0
