@@ -130,7 +130,7 @@ function applyHacks() {
   || pageUrl.indexOf('/pulls') > -1) {
     $('.js-issue-row').each(function() {
       var prRow              = $(this);
-      var prCreatorContainer = prRow.find('.issue-meta-section.opened-by').find('a');
+      var prCreatorContainer = prRow.find('.opened-by').find('a');
       var prCreator          = prCreatorContainer.text().trim();
       
       replaceUsernameWithDisplayName(prCreatorContainer, function(profile) {
@@ -176,10 +176,11 @@ function applyHacks() {
     $('.js-issue-row').each(function() {
       var prRow             = $(this);
       var prId              = prRow.attr('id');
-      var prUrl             = prRow.find('a.issue-title-link').attr('href');
-      var prTitleContainer  = prRow.find('.table-list-cell.issue-title');
-      var commentsContainer = prRow.find('.issue-comments');
+      var prUrl             = prRow.find('a.Box-row-link').attr('href');
+      var prTitleContainer  = prRow.find('.d-table-cell.width-full.p-3');
+      var commentsContainer = prRow.find('.d-table-cell.height-full.pr-3');
       
+      prTitleContainer.removeClass('width-full');
       prTitleContainer.width('540px');
       commentsContainer.width('200px');
       
@@ -205,7 +206,7 @@ function applyHacks() {
         var formUtf8          = $(html).find('input[name="utf8"]').val();
         var formCommitTitle   = $(html).find('input[name="commit_title"]').val();
         var formCommitMessage = $(html).find('textarea[name="commit_message"]').val();
-        var sibling           = prRow.find('div.table-list-cell.table-list-cell-avatar-stack');
+        var sibling           = prRow.find('.d-table-cell.pt-3.pr-3');
         
         // Shows merge button
         if ($(html).find('div.state.state-open').length > 0
@@ -228,7 +229,7 @@ function applyHacks() {
           var thumbsUpIcon     = $(document.createElement('img')).attr('title', ':+1:').attr('alt', ':+1:').attr('src', 'https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png').attr('width', '20').attr('height', '20').attr('align', 'absmiddle').addClass('emoji');
           var linkTitle        = '';
           var messageContainer = commentsContainer.find('.muted-link');
-          var messageCount     = messageContainer.text();
+          var messageCount     = messageContainer.find('span.h5').text();
           
           for (i = 0; i < approvers.size(); i++) {
             if (i === 0) {
@@ -246,11 +247,14 @@ function applyHacks() {
               .attr('title', linkTitle)
               .addClass('muted-link')
               .append(thumbsUpIcon)
-              .append('&nbsp;' + approvers.size())
+              .append($(document.createElement('span'))
+                .addClass('h5')
+                .append('&nbsp;' + approvers.size())
+              )
             )
           );
           
-          messageContainer.contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
+          messageContainer.find('span.h5').contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
         }
       }));
     });
