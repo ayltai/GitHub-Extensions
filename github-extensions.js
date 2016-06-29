@@ -177,8 +177,8 @@ function applyHacks() {
       var prRow             = $(this);
       var prId              = prRow.attr('id');
       var prUrl             = prRow.find('a.Box-row-link').attr('href');
-      var prTitleContainer  = prRow.find('.d-table-cell.width-full.p-3');
-      var commentsContainer = prRow.find('.d-table-cell.height-full.pr-3');
+      var prTitleContainer  = prRow.find('.d-table-cell.p-3');
+      var commentsContainer = prRow.find('.d-table-cell.pr-3').not('.pt-3');
       
       prTitleContainer.removeClass('width-full');
       prTitleContainer.width('540px');
