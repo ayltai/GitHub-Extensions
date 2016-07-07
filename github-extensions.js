@@ -229,7 +229,7 @@ function applyHacks() {
           var thumbsUpIcon     = $(document.createElement('img')).attr('title', ':+1:').attr('alt', ':+1:').attr('src', 'https://assets-cdn.github.com/images/icons/emoji/unicode/1f44d.png').attr('width', '20').attr('height', '20').attr('align', 'absmiddle').addClass('emoji');
           var linkTitle        = '';
           var messageContainer = commentsContainer.find('.muted-link');
-          var messageCount     = messageContainer.find('span.h5').text();
+          var messageCount     = messageContainer.find('span.text-small.text-bold').text();
           
           for (i = 0; i < approvers.size(); i++) {
             if (i === 0) {
@@ -248,13 +248,14 @@ function applyHacks() {
               .addClass('muted-link')
               .append(thumbsUpIcon)
               .append($(document.createElement('span'))
-                .addClass('h5')
+                .addClass('text-small')
+                .addClass('text-bold')
                 .append('&nbsp;' + approvers.size())
               )
             )
           );
           
-          messageContainer.find('span.h5').contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
+          messageContainer.find('span.text-small.text-bold').contents().last().replaceWith('&nbsp;' + (messageCount - approvers.size()));
         }
       }));
     });
