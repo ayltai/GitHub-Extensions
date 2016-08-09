@@ -210,7 +210,7 @@ function applyHacks() {
         
         // Shows merge button
         if ($(html).find('div.state.state-open').length > 0
-        && $(html).find('button.js-merge-branch-action').length > 0) {
+        && $(html).find('button.js-details-target').length > 0) {
           createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage);
         } else {
           sibling.after($(document.createElement('div'))
