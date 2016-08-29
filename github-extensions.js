@@ -71,8 +71,9 @@ function createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, f
   button.parent().remove();
   
   sibling.after($(document.createElement('div'))
-    .addClass('table-list-cell')
+    .addClass('float-left col-1')
     .css('width', '60px')
+    .css('padding', '12px')
     .append($(document.createElement('button'))
       .attr('id', mergeId + prId)
       .attr('type', 'button')
@@ -206,7 +207,9 @@ function applyHacks() {
         var formUtf8          = $(html).find('input[name="utf8"]').val();
         var formCommitTitle   = $(html).find('input[name="commit_title"]').val();
         var formCommitMessage = $(html).find('textarea[name="commit_message"]').val();
-        var sibling           = prRow.find('.d-table-cell.pt-3.pr-3');
+        var sibling           = prRow.find('div.float-left.col-9.p-3.lh-condensed');
+        
+        sibling.removeClass('col-9').addClass('col-8')
         
         // Shows merge button
         if ($(html).find('div.state.state-open').length > 0
@@ -214,8 +217,9 @@ function applyHacks() {
           createMergeButton(sibling, prId, prUrl, authToken, headSha, formUtf8, formCommitTitle, formCommitMessage);
         } else {
           sibling.after($(document.createElement('div'))
+            .addClass('float-left col-1')
             .css('width', '60px')
-            .addClass('table-list-cell')
+            .css('padding', '12px')
             .append('&nbsp;')
           );
         }
